@@ -66,6 +66,10 @@ function MakesPage(props) {
     closeAddDialog();
   }
 
+  function itemCheckboxClickHandler(id, checked) {
+    console.log("id:", id, "checked:", checked);
+  }
+
   function deleteItem() {
     setIsDeleteDialogOpen(true);
   }
@@ -92,6 +96,7 @@ function MakesPage(props) {
               display={["name"]}
               link={`/models/${item.link}`}
               editIcon={false}
+              checkboxClick={itemCheckboxClickHandler}
             ></ListItem>
           );
         })}
