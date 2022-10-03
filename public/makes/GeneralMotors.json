@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "model": "Camaro",
+    "year": "2015",
+    "type": "2 Door",
+    "engine": "5.0L V8"
+  },
+  {
+    "id": 2,
+    "model": "Malibu",
+    "year": "2020",
+    "type": "4 Door",
+    "engine": "2.0L I4"
+  }
+]

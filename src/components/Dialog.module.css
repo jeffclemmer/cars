@@ -1,0 +1,54 @@
+.dialog {
+  z-index: 1000;
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  width: 330px;
+  margin-left: -165px;
+  max-height: 500px;
+  border: 1px #888 solid;
+  border-radius: 3px;
+  background-color: #444;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+  font-size: 18px;
+  overflow-y: auto;
+}
+.title {
+  font-size: 26px;
+  text-align: center;
+  font-weight: normal;
+}
+.slot {
+  padding: 20px;
+}
+hr.divider {
+  margin: 0;
+  border: 0;
+  background-color: #777;
+  height: 1px;
+}
+
+.buttons {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+button.btn:first-child {
+  width: 50%;
+  border: 0;
+}
+button.btn {
+  width: 50%;
+  border: 0;
+  padding: 10px 0;
+  border-left: 1px #aaa solid;
+  color: #aaa;
+}
+button.btn:hover {
+  color: #333;
+  background-color: #aaa;
+}
+button.btn:disabled {
+  color: #999;
+}
