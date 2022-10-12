@@ -17,32 +17,31 @@ function ModelsPage(props) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [models, updateModels] = useState([]);
+  const [make, updateMake] = useState([]);
 
   // get the make passed in as part of the url
-  let { make } = useParams();
+  let { id } = useParams();
 
   // load a make and its models
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch(`/makes/${make}.json`, {});
+        const res = await fetch(`//localhost:3000/models/${id}`, {});
 
         if (res.status === 200) {
           const data = await res.json();
-          updateModels(data);
+          console.log("data:", data);
+          updateMake(data.make);
+          updateModels(data.models);
         } else {
           console.log("there was a server error");
         }
       } catch (error) {
-        /* 
-        for whatever reason, if we fetch a make that doesn't exist from our local 
-        dev server, instead of returning 404, it returns a 200 and still tries to execute res.json() which then throws an error here...
-         */
-        console.log("make not found");
+        console.log("fetch error:", error);
       }
     }
     load();
-  }, [make]);
+  }, [id]);
 
   function addItem() {
     setIsAddDialogOpen(true);
@@ -126,7 +125,7 @@ function ModelsPage(props) {
               key={index}
               id={item.id}
               fields={item}
-              display={["model", "type", "year", "engine"]}
+              display={["name", "type", "year", "engine"]}
               edit={editItem}
               editIcon={true}
             ></ListItem>

@@ -5,6 +5,10 @@ import { BrowserRouter } from "react-router-dom";
 import "./css/index.css";
 import App from "./App";
 
+/* 
+<React.StrictMode> forces fetches to load twice in dev mode
+*/
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>

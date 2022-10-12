@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import Dialog from "../components/Dialog";
 import Overlay from "../components/Overlay";
@@ -11,16 +11,27 @@ function MakesPage(props) {
   const makeInputRef = useRef();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [makes, updateMakes] = useState([
-    { id: makeId(), link: "Ford", name: "Ford", selected: false },
-    {
-      id: makeId(),
-      link: "GeneralMotors",
-      name: "General Motors",
-      selected: false,
-    },
-    { id: makeId(), link: "Honda", name: "Honda", selected: false },
-  ]);
+  const [makes, updateMakes] = useState([]);
+
+  // load list of makes
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch(`//localhost:3000/makes`, {});
+
+        if (res.status === 200) {
+          const data = await res.json();
+          console.log("data:", data);
+          updateMakes(data);
+        } else {
+          console.log("there was a server error");
+        }
+      } catch (error) {
+        console.log("fetch error", error);
+      }
+    }
+    load();
+  }, []);
 
   function addItem() {
     setIsAddDialogOpen(true);
@@ -37,7 +48,6 @@ function MakesPage(props) {
       // normally we would do some deeper form validation here...
       if (make !== "") {
         makes.push({
-          id: makeId(),
           link: make.replace(" ", ""),
           name: make,
           selected: false,
@@ -87,10 +97,10 @@ function MakesPage(props) {
           return (
             <ListItem
               key={index}
-              id={item.id}
+              id={item.link}
               fields={item}
-              display={["name"]}
-              link={`/models/${item.link}`}
+              display={["make"]}
+              link={`/models/${item.id}`}
               editIcon={false}
             ></ListItem>
           );
@@ -123,10 +133,6 @@ function MakesPage(props) {
       )}
     </div>
   );
-}
-
-function makeId() {
-  return Math.ceil(Math.random() * 10000);
 }
 
 export default MakesPage;

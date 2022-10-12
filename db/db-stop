@@ -1,0 +1,2 @@
+docker stop cars-dynamodb
+docker rm cars-dynamodb

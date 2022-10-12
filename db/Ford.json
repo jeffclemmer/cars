@@ -1,0 +1,26 @@
+{
+  "id": { "S": "1" },
+  "make": { "S": "Ford" },
+  "models": {
+    "L": [
+      {
+        "M": {
+          "id": { "S": "1" },
+          "name": { "S": "F-150" },
+          "year": { "S": "2010" },
+          "type": { "S": "Truck" },
+          "engine": { "S": "5.0L V8" }
+        }
+      },
+      {
+        "M": {
+          "id": { "S": "2" },
+          "name": { "S": "Focus" },
+          "year": { "S": "2020" },
+          "type": { "S": "Hatchback" },
+          "engine": { "S": "2.0L I4" }
+        }
+      }
+    ]
+  }
+}

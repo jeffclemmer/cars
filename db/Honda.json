@@ -1,0 +1,26 @@
+{
+  "id": { "S": "3" },
+  "make": { "S": "Honda" },
+  "models": {
+    "L": [
+      {
+        "M": {
+          "id": { "S": "1" },
+          "name": { "S": "Accord" },
+          "year": { "S": "2018" },
+          "type": { "S": "4 Door" },
+          "engine": { "S": "3.0L V6" }
+        }
+      },
+      {
+        "M": {
+          "id": { "S": "2" },
+          "name": { "S": "Civic" },
+          "year": { "S": "2017" },
+          "type": { "S": "4 Door" },
+          "engine": { "S": "1.6L I4" }
+        }
+      }
+    ]
+  }
+}
