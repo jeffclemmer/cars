@@ -27,7 +27,7 @@ const AWS = require("aws-sdk");
 const dynamo =
   process.env.AWS_SAM_LOCAL === "true"
     ? new AWS.DynamoDB.DocumentClient({
-        endpoint: new AWS.Endpoint("http://192.168.1.197:8000"),
+        endpoint: new AWS.Endpoint("http://cars-app:8000"),
       })
     : new AWS.DynamoDB.DocumentClient();
 
