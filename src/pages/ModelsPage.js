@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import Dialog from "../components/Dialog";
 import Overlay from "../components/Overlay";
 import Toolbar from "../components/Toolbar";
+import Loading from "../components/Loading";
 import List from "../components/List";
 import ListItem from "../components/ListItem";
 
@@ -14,6 +15,7 @@ function ModelsPage(props) {
   const typeInputRef = useRef();
   const engineInputRef = useRef();
 
+  const [isLoading, setIsLoading] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [models, updateModels] = useState([]);
@@ -35,6 +37,7 @@ function ModelsPage(props) {
   }, [make]);
 
   async function loadData(make) {
+    setIsLoading(true);
     try {
       const res = await fetch(`//localhost:3000/models/${make}`, {});
 
@@ -47,6 +50,8 @@ function ModelsPage(props) {
       }
     } catch (error) {
       console.log("fetch error:", error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -69,6 +74,7 @@ function ModelsPage(props) {
     if (text === "Save") {
       // normally we would do some deeper form validation here...
       if (model && year && type && engine) {
+        setIsLoading(true);
         const res = await fetch("//localhost:3000/add-model", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -116,6 +122,8 @@ function ModelsPage(props) {
     if (text === "Yes") {
       // execute delete
       let ids = selected.join(",");
+
+      setIsLoading(true);
 
       // the server returns "+" after completing
       await fetch(`//localhost:3000/delete-model/${make}?models=${ids}`, {});
@@ -208,6 +216,9 @@ function ModelsPage(props) {
           <p>Are you sure you want to delete these items?</p>
         </Dialog>
       )}
+
+      {isLoading && <Overlay />}
+      {isLoading && <Loading />}
     </div>
   );
 }

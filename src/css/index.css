@@ -1,10 +1,11 @@
-body{
+body {
   margin: 0;
   background-color: #333;
   color: #aaa;
-  font-family: Roboto, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
-main{
+main {
   margin: auto;
   width: 1000px;
 }
@@ -22,7 +23,7 @@ button {
 }
 
 button:hover {
-  color: rgba(255,255,255,0.8);
+  color: rgba(255, 255, 255, 0.8);
   background-color: rgba(255, 255, 255, 0.3);
 }
 
@@ -34,9 +35,9 @@ button:disabled:hover {
   cursor: auto;
 }
 
-input[type="text"]{
+input[type="text"] {
   font-size: 18px;
-  background-color: rgba(255,255,255,0.1);
+  background-color: rgba(255, 255, 255, 0.1);
   border: 0;
   color: #bbb;
   padding: 6px;
@@ -47,25 +48,24 @@ input[type="text"]{
   outline: none;
 }
 
-.toolbar{
+.toolbar {
   padding: 20px 5px;
-  background-color: rgba(255,255,255,0.1);
+  background-color: rgba(255, 255, 255, 0.1);
   display: grid;
   grid-template-columns: 32px auto 32px;
   font-size: 20px;
   border-bottom: 1px #333 solid;
 }
-.toolbar-add{
+.toolbar-add {
   grid-column: 1;
 }
-.toolbar-title{
+.toolbar-title {
   grid-column: 2;
   text-align: center;
 }
-.toolbar-delete{
+.toolbar-delete {
   grid-column: 3;
 }
-
 
 .overlay {
   position: fixed;
@@ -74,51 +74,55 @@ input[type="text"]{
   right: 0;
   top: 0;
   bottom: 0;
-  background-color: rgba(0,0,0,0.4);
+  background-color: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(1px);
 }
 
-.list-header{
+.list-header {
   display: grid;
   grid-template-columns: 32px;
   align-items: center;
   height: 50px;
-  background-color: rgba(255,255,255,0.075);
+  background-color: rgba(255, 255, 255, 0.075);
   border-bottom: 1px #333 solid;
 }
-.list-header-cols{
+.list-header-cols {
   font-weight: bold;
   color: #bbb;
 }
 
-.list-item{
+.list-item {
   display: grid;
   grid-template-columns: 32px;
   align-items: center;
   height: 50px;
-  background-color: rgba(255,255,255,0.05);
+  background-color: rgba(255, 255, 255, 0.05);
   cursor: pointer;
   border-bottom: 1px #333 solid;
 }
-.list-item:hover{
-  background: linear-gradient(to right, rgba(255,255,255,0.075), rgba(255,255,255,0.05));
+.list-item:hover {
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.075),
+    rgba(255, 255, 255, 0.05)
+  );
 }
 
-.list-item-col{
+.list-item-col {
   grid-column: 1;
   text-align: center;
 }
 
-.list-footer{
+.list-footer {
   display: grid;
   grid-template-columns: auto 32px 32px;
-  background-color: rgba(255,255,255,0.075);
+  background-color: rgba(255, 255, 255, 0.075);
   align-items: center;
 }
-.list-prev{
+.list-prev {
   grid-column: 2;
 }
-.list-next{
+.list-next {
   grid-column: 3;
 }
 
@@ -126,6 +130,31 @@ input[type="text"]{
   font-size: 14px;
   color: #777;
 }
-.center{
+.center {
   text-align: center;
+}
+
+.spin-container {
+  position: absolute;
+  z-index: 51;
+  text-align: center;
+  top: 100px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.spinner {
+  width: 50px;
+  height: 50px;
+}
+.spin {
+  animation: spin 2s linear infinite;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

@@ -3,12 +3,14 @@ import { useState, useRef, useEffect } from "react";
 import Dialog from "../components/Dialog";
 import Overlay from "../components/Overlay";
 import Toolbar from "../components/Toolbar";
+import Loading from "../components/Loading";
 import List from "../components/List";
 import ListItem from "../components/ListItem";
 
 // contains the entire page for Makes
 function MakesPage(props) {
   const makeInputRef = useRef();
+  const [isLoading, setIsLoading] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [makes, updateMakes] = useState([]);
@@ -26,6 +28,7 @@ function MakesPage(props) {
   }, []);
 
   async function loadData() {
+    setIsLoading(true);
     try {
       const res = await fetch(`//localhost:3000/makes`, {});
 
@@ -37,6 +40,8 @@ function MakesPage(props) {
       }
     } catch (error) {
       console.log("fetch error", error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -56,6 +61,8 @@ function MakesPage(props) {
 
       // normally we would do some deeper form validation here...
       if (make !== "") {
+        setIsLoading(true);
+
         const res = await fetch("//localhost:3000/add-make", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -94,8 +101,10 @@ function MakesPage(props) {
       // execute delete
       let ids = selected.join(",");
 
+      setIsLoading(true);
       // the server returns "+" after completing
       await fetch(`//localhost:3000/delete-make?makes=${ids}`, {});
+      setIsLoading(false);
 
       loadData();
     }
@@ -151,6 +160,9 @@ function MakesPage(props) {
           Are you sure you want to delete these items?
         </Dialog>
       )}
+
+      {isLoading && <Overlay />}
+      {isLoading && <Loading />}
     </div>
   );
 }
