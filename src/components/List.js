@@ -1,5 +1,7 @@
 import gridLayout from "../helpers/GridLayout";
 
+import Checkbox from "../components/Checkbox";
+
 function List(props) {
   let gridTemplateColumns = gridLayout(props.cols);
 
@@ -10,7 +12,7 @@ function List(props) {
         style={{ gridTemplateColumns: gridTemplateColumns }}
       >
         <div className="list-item-col">
-          <input type="checkbox"></input>
+          <Checkbox value={true} disabled />
         </div>
 
         {/* we use style here to custom size each column */}

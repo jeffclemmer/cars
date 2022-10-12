@@ -94,6 +94,10 @@ function ModelsPage(props) {
     closeAddDialog();
   }
 
+  function itemCheckboxClickHandler(id, checked) {
+    console.log("id:", id, "checked:", checked);
+  }
+
   function editItem(id) {
     console.log("listItem editClick id:", id);
   }
@@ -128,6 +132,7 @@ function ModelsPage(props) {
               display={["name", "type", "year", "engine"]}
               edit={editItem}
               editIcon={true}
+              checkboxClick={itemCheckboxClickHandler}
             ></ListItem>
           );
         })}

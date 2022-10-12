@@ -1,4 +1,21 @@
 /* 
+
+props accepted
+key = should be map.index
+id = an item id
+fields = an item with any field type
+display = an array of fields to display that match fields from {fields} - explained 
+  below
+    ie: {["model", "type", "year", "engine"]}
+link = a link to send the user to when a row is clicked
+  ie: /path/to/link
+edit = a function that is called when the user clicks a link. the {id} is passed to 
+  that function
+editIcon = boolean - display an edit icon on the right side of the row
+checkboxClick = a function that is called when a user clicks a checkbox.  the {id} and {true, false} are passed back to the function
+  ie: checkboxClick={clickHandler}
+  function clickHandler(id, checked) {}
+
 props.fields is an object that contains the fields we want to display.  this object can 
 contain anything.  coupled with an array, props.display contains the field names
 that we want to display from props.fields.
@@ -16,6 +33,8 @@ the above would create a two column list item, showing only col1 and col2 in tha
 import { useNavigate } from "react-router-dom";
 
 import gridLayout from "../helpers/GridLayout";
+
+import Checkbox from "../components/Checkbox";
 
 function ListItem(props) {
   const navigate = useNavigate();
@@ -50,13 +69,20 @@ function ListItem(props) {
     }
   }
 
+  function checkboxClick(checked) {
+    // if we have a function, call it and pass back the info
+    if ("checkboxClick" in props && typeof props.checkboxClick == "function") {
+      props.checkboxClick(props.id, checked);
+    }
+  }
+
   return (
     <div
       className="list-item"
       style={{ gridTemplateColumns: gridTemplateColumns }}
     >
       <div className="list-item-col">
-        <input type="checkbox"></input>
+        <Checkbox onClick={checkboxClick} />
       </div>
 
       {/* we use style here to custom size each column */}
