@@ -1,10 +1,9 @@
 {
   "name": "hello_world",
   "version": "1.0.0",
-  "description": "hello world sample for NodeJS",
+  "description": "API for cars",
   "main": "app.js",
-  "repository": "https://github.com/awslabs/aws-sam-cli/tree/develop/samcli/local/init/templates/cookiecutter-aws-sam-hello-nodejs",
-  "author": "SAM CLI",
+  "author": "jeff clemmer <clemmer.jeff@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "axios": ">=0.21.1"

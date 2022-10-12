@@ -82,7 +82,7 @@ function ListItem(props) {
       style={{ gridTemplateColumns: gridTemplateColumns }}
     >
       <div className="list-item-col">
-        <Checkbox onClick={checkboxClick} />
+        <Checkbox key={props.id} onClick={checkboxClick} />
       </div>
 
       {/* we use style here to custom size each column */}

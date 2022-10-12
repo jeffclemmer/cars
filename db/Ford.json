@@ -1,6 +1,7 @@
 {
-  "id": { "S": "1" },
-  "make": { "S": "Ford" },
+  "cid": { "S": "123456" },
+  "make": { "S": "ford" },
+  "dname": { "S": "Ford" },
   "models": {
     "L": [
       {

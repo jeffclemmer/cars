@@ -13,25 +13,32 @@ function MakesPage(props) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [makes, updateMakes] = useState([]);
 
+  // an array of ids that points into "makes".  if an id
+  // exists in this array, that means it's selected = true
+  const [selected, updateSelected] = useState([]);
+
   // load list of makes
   useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch(`//localhost:3000/makes`, {});
-
-        if (res.status === 200) {
-          const data = await res.json();
-          console.log("data:", data);
-          updateMakes(data);
-        } else {
-          console.log("there was a server error");
-        }
-      } catch (error) {
-        console.log("fetch error", error);
-      }
+    function load() {
+      loadData();
     }
     load();
   }, []);
+
+  async function loadData() {
+    try {
+      const res = await fetch(`//localhost:3000/makes`, {});
+
+      if (res.status === 200) {
+        const data = await res.json();
+        updateMakes(data);
+      } else {
+        console.log("there was a server error");
+      }
+    } catch (error) {
+      console.log("fetch error", error);
+    }
+  }
 
   function addItem() {
     setIsAddDialogOpen(true);
@@ -41,55 +48,57 @@ function MakesPage(props) {
     setIsAddDialogOpen(false);
   }
 
-  function addDialogButtonHandler(text) {
+  async function addDialogButtonHandler(text) {
+    closeAddDialog();
     if (text === "Save") {
-      const make = makeInputRef.current.value;
+      const name = makeInputRef.current.value;
+      const make = name.toLowerCase().replace(" ", "");
 
       // normally we would do some deeper form validation here...
       if (make !== "") {
-        makes.push({
-          link: make.replace(" ", ""),
-          name: make,
-          selected: false,
+        const res = await fetch("//localhost:3000/add-make", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            make: make,
+            dname: name,
+          }),
         });
 
-        // sort makes by name
-        makes.sort((a, b) => {
-          const nameA = a.name.toUpperCase(); // ignore upper and lowercase
-          const nameB = b.name.toUpperCase(); // ignore upper and lowercase
-          if (nameA < nameB) {
-            return -1;
-          }
-          if (nameA > nameB) {
-            return 1;
-          }
-
-          // names must be equal
-          return 0;
-        });
-
-        console.log("makes:", makes);
-        updateMakes(makes);
+        loadData();
       }
     }
-
-    closeAddDialog();
   }
 
   function itemCheckboxClickHandler(id, checked) {
-    console.log("id:", id, "checked:", checked);
+    let index = selected.findIndex((item) => item === id);
+    if (index === -1) {
+      selected.push(id);
+    } else {
+      selected.splice(index, 1);
+    }
+    updateSelected(selected);
   }
 
   function deleteItem() {
-    setIsDeleteDialogOpen(true);
+    if (selected.length > 0) setIsDeleteDialogOpen(true);
   }
 
   function closeDeleteDialog() {
     setIsDeleteDialogOpen(false);
   }
 
-  function deleteDialogButtonHandler(text) {
+  async function deleteDialogButtonHandler(text) {
     closeDeleteDialog();
+    if (text === "Yes") {
+      // execute delete
+      let ids = selected.join(",");
+
+      // the server returns "+" after completing
+      await fetch(`//localhost:3000/delete-make?makes=${ids}`, {});
+
+      loadData();
+    }
   }
 
   return (
@@ -101,10 +110,10 @@ function MakesPage(props) {
           return (
             <ListItem
               key={index}
-              id={item.link}
+              id={item.make}
               fields={item}
-              display={["make"]}
-              link={`/models/${item.id}`}
+              display={["dname"]}
+              link={`/models/${item.make}`}
               editIcon={false}
               checkboxClick={itemCheckboxClickHandler}
             ></ListItem>
@@ -121,7 +130,13 @@ function MakesPage(props) {
         >
           <div>
             <label htmlFor="make">Name of Make</label>
-            <input type="text" required id="make" ref={makeInputRef} />
+            <input
+              type="text"
+              required
+              id="make"
+              ref={makeInputRef}
+              autoComplete="off"
+            />
           </div>
         </Dialog>
       )}

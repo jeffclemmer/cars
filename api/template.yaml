@@ -17,6 +17,22 @@ Resources:
         Type: String
       TableName: Cars
 
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Dev
+      # Cors:
+      #   AllowMethods: "'GET, POST, OPTIONS'"
+      #   AllowHeaders: "'X-Forwarded-For'"
+      #   AllowOrigin: "'*'"
+      #   MaxAge: "'86400'"
+      #   AllowCredentials: true
+      Cors:
+        AllowMethods: "'GET, POST, OPTIONS'"
+        AllowOrigin: "'*'"
+        AllowHeaders: "'Content-type, x-api-key'"
+        MaxAge: "'86400'"
+
   CarsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -29,26 +45,41 @@ Resources:
       Architectures:
         - x86_64
       Events:
+        CorsPreflightEvent:
+          Type: HttpApi
+          Properties:
+            Path: /{proxy+}
+            Method: OPTIONS
         GetMakes:
           Type: HttpApi
           Properties:
             Path: /makes
             Method: get
-        GetModels:
+        AddMake:
           Type: HttpApi
           Properties:
-            Path: /models/{id}
-            Method: get
+            Path: /add-make
+            Method: post
         DeleteMake:
           Type: HttpApi
           Properties:
-            Path: /make/{id}
-            Method: delete
+            Path: /delete-make
+            Method: get
+        GetModels:
+          Type: HttpApi
+          Properties:
+            Path: /models/{make}
+            Method: get
+        AddModel:
+          Type: HttpApi
+          Properties:
+            Path: /add-model
+            Method: post
         DeleteModel:
           Type: HttpApi
           Properties:
-            Path: /model/{makeId}/{modelId}
-            Method: delete
+            Path: /delete-model/{make}
+            Method: get
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function

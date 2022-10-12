@@ -17,31 +17,38 @@ function ModelsPage(props) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [models, updateModels] = useState([]);
-  const [make, updateMake] = useState([]);
+  const [name, updateName] = useState([]);
+
+  // an array of ids that points into "makes".  if an id
+  // exists in this array, that means it's selected = true
+  const [selected, updateSelected] = useState([]);
 
   // get the make passed in as part of the url
-  let { id } = useParams();
+  let { make } = useParams();
 
   // load a make and its models
   useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch(`//localhost:3000/models/${id}`, {});
-
-        if (res.status === 200) {
-          const data = await res.json();
-          console.log("data:", data);
-          updateMake(data.make);
-          updateModels(data.models);
-        } else {
-          console.log("there was a server error");
-        }
-      } catch (error) {
-        console.log("fetch error:", error);
-      }
+    function load() {
+      loadData(make);
     }
     load();
-  }, [id]);
+  }, [make]);
+
+  async function loadData(make) {
+    try {
+      const res = await fetch(`//localhost:3000/models/${make}`, {});
+
+      if (res.status === 200) {
+        const data = await res.json();
+        updateName(data.dname);
+        updateModels(data.models);
+      } else {
+        console.log("there was a server error");
+      }
+    } catch (error) {
+      console.log("fetch error:", error);
+    }
+  }
 
   function addItem() {
     setIsAddDialogOpen(true);
@@ -51,7 +58,9 @@ function ModelsPage(props) {
     setIsAddDialogOpen(false);
   }
 
-  function addDialogButtonHandler(text) {
+  async function addDialogButtonHandler(text) {
+    closeAddDialog();
+
     const model = modelInputRef.current.value;
     const year = yearInputRef.current.value;
     const type = typeInputRef.current.value;
@@ -59,43 +68,35 @@ function ModelsPage(props) {
 
     if (text === "Save") {
       // normally we would do some deeper form validation here...
-      if (make !== "") {
-        models.push({
-          id: makeId(),
-          model: model,
-          year: year,
-          type: type,
-          engine: engine,
+      if (model && year && type && engine) {
+        const res = await fetch("//localhost:3000/add-model", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            make: make,
+            model: model,
+            year: year,
+            type: type,
+            engine: engine,
+          }),
         });
 
-        // sort models by name
-        models.sort((a, b) => {
-          const modelA = a.model.toUpperCase(); // ignore upper and lowercase
-          const modelB = b.model.toUpperCase(); // ignore upper and lowercase
-          if (modelA < modelB) {
-            return -1;
-          }
-          if (modelA > modelB) {
-            return 1;
-          }
-
-          // names must be equal
-          return 0;
-        });
-
-        console.log("models:", models);
-        updateModels(models);
+        loadData(make);
       }
     }
 
     if (text === "Update") {
     }
-
-    closeAddDialog();
   }
 
   function itemCheckboxClickHandler(id, checked) {
-    console.log("id:", id, "checked:", checked);
+    let index = selected.findIndex((item) => item === id);
+    if (index === -1) {
+      selected.push(id);
+    } else {
+      selected.splice(index, 1);
+    }
+    updateSelected(selected);
   }
 
   function editItem(id) {
@@ -103,22 +104,30 @@ function ModelsPage(props) {
   }
 
   function deleteItem() {
-    setIsDeleteDialogOpen(true);
+    if (selected.length > 0) setIsDeleteDialogOpen(true);
   }
 
   function closeDeleteDialog() {
     setIsDeleteDialogOpen(false);
   }
 
-  function buttonHandler(text) {
-    console.log("text:", text);
+  async function buttonHandler(text) {
     closeDeleteDialog();
+    if (text === "Yes") {
+      // execute delete
+      let ids = selected.join(",");
+
+      // the server returns "+" after completing
+      await fetch(`//localhost:3000/delete-model/${make}?models=${ids}`, {});
+
+      loadData(make);
+    }
   }
 
   return (
     <div>
       <Toolbar
-        title={`Car Models - ${make}`}
+        title={`Car Models - ${name}`}
         addClick={addItem}
         deleteClick={deleteItem}
       />
@@ -147,19 +156,43 @@ function ModelsPage(props) {
         >
           <div>
             <label htmlFor="make">Model</label>
-            <input type="text" required id="model" ref={modelInputRef} />
+            <input
+              type="text"
+              required
+              id="model"
+              ref={modelInputRef}
+              autoComplete="off"
+            />
           </div>
           <div>
             <label htmlFor="make">Year</label>
-            <input type="text" required id="year" ref={yearInputRef} />
+            <input
+              type="text"
+              required
+              id="year"
+              ref={yearInputRef}
+              autoComplete="off"
+            />
           </div>
           <div>
             <label htmlFor="make">Type</label>
-            <input type="text" required id="type" ref={typeInputRef} />
+            <input
+              type="text"
+              required
+              id="type"
+              ref={typeInputRef}
+              autoComplete="off"
+            />
           </div>
           <div>
             <label htmlFor="make">Engine</label>
-            <input type="text" required id="engine" ref={engineInputRef} />
+            <input
+              type="text"
+              required
+              id="engine"
+              ref={engineInputRef}
+              autoComplete="off"
+            />
           </div>
         </Dialog>
       )}
@@ -173,16 +206,10 @@ function ModelsPage(props) {
           buttonHandler={buttonHandler}
         >
           <p>Are you sure you want to delete these items?</p>
-
-          <p className="small">(delete is not implemented)</p>
         </Dialog>
       )}
     </div>
   );
-}
-
-function makeId() {
-  return Math.ceil(Math.random() * 10000);
 }
 
 export default ModelsPage;

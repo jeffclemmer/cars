@@ -8,10 +8,8 @@ function App() {
     <main>
       <Routes>
         <Route path="/" element={<MakesPage />} />
-        <Route path="/models/:id" element={<ModelsPage />} />
+        <Route path="/models/:make" element={<ModelsPage />} />
       </Routes>
-
-      <div className="small center">(no changes are saved)</div>
     </main>
   );
 }
