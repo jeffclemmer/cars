@@ -1,15 +1,19 @@
 ## Cars - Makes and Models
 
-This is a quick React Demo App I through together over a couple of days.
-
-You can see a test version of it at:
-
-[https://cars-xg5.pages.dev/](https://cars-xg5.pages.dev/)
-
-Once DNS updates, it'll be available at:
+You can try out the entire app here:
 
 [https://cars.jeffclemmer.net/](https://cars.jeffclemmer.net/)
 
-It's very basic. At the moment, it does not save any changes to the API. It does load JSON files from the API for car models.
+This _was_ a quick React Demo App I through together over a couple of days. Now it's got a full backend using AWS API Gateway -> Lambda -> DynamoDB and configured using AWS SAM / CloudFormation.
 
-This is essentially just a code test for myself to keep current in the realm of React ;-)
+It's pretty simple. It implements a simple car inventory system. There is one feature that isn't implemented. Editting. That's easily added though. Let me know if you'd like me to do that.
+
+I built this to keep up with modern AWS and React development.
+
+This app uses multiple cloud providers to do its thing.
+
+AWS hosts the back end API and DB.
+
+The front end is hosted on Cloudflare Pages.
+
+[https://pages.cloudflare.com/](https://pages.cloudflare.com/)
