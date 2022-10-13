@@ -39,7 +39,10 @@ function ModelsPage(props) {
   async function loadData(make) {
     setIsLoading(true);
     try {
-      const res = await fetch(`//localhost:3000/models/${make}`, {});
+      const res = await fetch(
+        `https://ekib68jot5.execute-api.us-west-2.amazonaws.com/models/${make}`,
+        {}
+      );
 
       if (res.status === 200) {
         const data = await res.json();
@@ -75,17 +78,20 @@ function ModelsPage(props) {
       // normally we would do some deeper form validation here...
       if (model && year && type && engine) {
         setIsLoading(true);
-        const res = await fetch("//localhost:3000/add-model", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            make: make,
-            model: model,
-            year: year,
-            type: type,
-            engine: engine,
-          }),
-        });
+        const res = await fetch(
+          "https://ekib68jot5.execute-api.us-west-2.amazonaws.com/add-model",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              make: make,
+              model: model,
+              year: year,
+              type: type,
+              engine: engine,
+            }),
+          }
+        );
 
         loadData(make);
       }
@@ -126,7 +132,10 @@ function ModelsPage(props) {
       setIsLoading(true);
 
       // the server returns "+" after completing
-      await fetch(`//localhost:3000/delete-model/${make}?models=${ids}`, {});
+      await fetch(
+        `https://ekib68jot5.execute-api.us-west-2.amazonaws.com/delete-model/${make}?models=${ids}`,
+        {}
+      );
 
       loadData(make);
     }

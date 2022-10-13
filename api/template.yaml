@@ -3,45 +3,30 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   cars api
 
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 300
+    Timeout: 3
 
 Resources:
-  ItemsTable:
-    Type: AWS::Serverless::SimpleTable
-    Properties:
-      PrimaryKey:
-        Name: make
-        Type: String
-      TableName: Cars
-
-  ApiGatewayApi:
-    Type: AWS::Serverless::Api
-    Properties:
-      StageName: Dev
-      # Cors:
-      #   AllowMethods: "'GET, POST, OPTIONS'"
-      #   AllowHeaders: "'X-Forwarded-For'"
-      #   AllowOrigin: "'*'"
-      #   MaxAge: "'86400'"
-      #   AllowCredentials: true
-      Cors:
-        AllowMethods: "'GET, POST, OPTIONS'"
-        AllowOrigin: "'*'"
-        AllowHeaders: "'Content-type, x-api-key'"
-        MaxAge: "'86400'"
+  # ApiGatewayApi:
+  #   Type: AWS::Serverless::Api
+  #   Properties:
+  #     StageName: Prod
+  #     Cors:
+  #       AllowMethods: "'GET, POST, OPTIONS'"
+  #       AllowOrigin: "'*'"
+  #       AllowHeaders: "'Content-type, x-api-key'"
+  #       MaxAge: "'86400'"
 
   CarsFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: cars/
       Handler: app.handler
       Runtime: nodejs16.x
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: !Ref Cars
+            TableName: !Ref CarsTable
       Architectures:
         - x86_64
       Events:
@@ -81,13 +66,30 @@ Resources:
             Path: /delete-model/{make}
             Method: get
 
+  CarsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "cid"
+          AttributeType: "S"
+        - AttributeName: "make"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "cid"
+          KeyType: "HASH"
+        - AttributeName: "make"
+          KeyType: "RANGE"
+      TableName: "Cars"
+      BillingMode: PAY_PER_REQUEST
+      TableClass: STANDARD
+
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   CarsApi:
     Description: "API Gateway endpoint URL for Prod stage for Cars function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/"
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/"
   CarsFunction:
     Description: "Cars Lambda Function ARN"
     Value: !GetAtt CarsFunction.Arn
@@ -96,4 +98,4 @@ Outputs:
     Value: !GetAtt CarsFunctionRole.Arn
   Function:
     Description: "DynamoDB handler function ARN"
-    Value: !GetAtt DDBHandlerFunction.Arn
+    Value: !GetAtt CarsFunction.Arn

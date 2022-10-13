@@ -30,7 +30,10 @@ function MakesPage(props) {
   async function loadData() {
     setIsLoading(true);
     try {
-      const res = await fetch(`//localhost:3000/makes`, {});
+      const res = await fetch(
+        `https://ekib68jot5.execute-api.us-west-2.amazonaws.com/makes`,
+        {}
+      );
 
       if (res.status === 200) {
         const data = await res.json();
@@ -63,14 +66,17 @@ function MakesPage(props) {
       if (make !== "") {
         setIsLoading(true);
 
-        const res = await fetch("//localhost:3000/add-make", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            make: make,
-            dname: name,
-          }),
-        });
+        const res = await fetch(
+          "https://ekib68jot5.execute-api.us-west-2.amazonaws.com/add-make",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              make: make,
+              dname: name,
+            }),
+          }
+        );
 
         loadData();
       }
@@ -103,7 +109,10 @@ function MakesPage(props) {
 
       setIsLoading(true);
       // the server returns "+" after completing
-      await fetch(`//localhost:3000/delete-make?makes=${ids}`, {});
+      await fetch(
+        `https://ekib68jot5.execute-api.us-west-2.amazonaws.com/delete-make?makes=${ids}`,
+        {}
+      );
       setIsLoading(false);
 
       loadData();
