@@ -39,13 +39,11 @@ function ModelsPage(props) {
   async function loadData(make) {
     setIsLoading(true);
     try {
-      const res = await fetch(
-        `https://ekib68jot5.execute-api.us-west-2.amazonaws.com/models/${make}`,
-        {}
-      );
+      const res = await fetch(`//localhost:3000/models/${make}`, {});
 
       if (res.status === 200) {
         const data = await res.json();
+        console.log("data:", data);
         updateName(data.dname);
         updateModels(data.models);
       } else {
@@ -67,7 +65,7 @@ function ModelsPage(props) {
   }
 
   async function addDialogButtonHandler(text) {
-    closeAddDialog();
+    if (text === "Cancel") closeAddDialog();
 
     const model = modelInputRef.current.value;
     const year = yearInputRef.current.value;
@@ -77,21 +75,19 @@ function ModelsPage(props) {
     if (text === "Save") {
       // normally we would do some deeper form validation here...
       if (model && year && type && engine) {
+        closeAddDialog();
         setIsLoading(true);
-        const res = await fetch(
-          "https://ekib68jot5.execute-api.us-west-2.amazonaws.com/add-model",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              make: make,
-              model: model,
-              year: year,
-              type: type,
-              engine: engine,
-            }),
-          }
-        );
+        const res = await fetch("//localhost:3000/add-model", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            make: make,
+            model: model,
+            year: year,
+            type: type,
+            engine: engine,
+          }),
+        });
 
         loadData(make);
       }
@@ -132,10 +128,7 @@ function ModelsPage(props) {
       setIsLoading(true);
 
       // the server returns "+" after completing
-      await fetch(
-        `https://ekib68jot5.execute-api.us-west-2.amazonaws.com/delete-model/${make}?models=${ids}`,
-        {}
-      );
+      await fetch(`//localhost:3000/delete-model/${make}?models=${ids}`, {});
 
       loadData(make);
     }
@@ -172,7 +165,9 @@ function ModelsPage(props) {
           buttons={["Cancel", "Save"]}
         >
           <div>
-            <label htmlFor="make">Model</label>
+            <label htmlFor="make">
+              Model <span className="required">*</span>
+            </label>
             <input
               type="text"
               required
@@ -182,7 +177,9 @@ function ModelsPage(props) {
             />
           </div>
           <div>
-            <label htmlFor="make">Year</label>
+            <label htmlFor="make">
+              Year <span className="required">*</span>
+            </label>
             <input
               type="text"
               required
@@ -192,7 +189,9 @@ function ModelsPage(props) {
             />
           </div>
           <div>
-            <label htmlFor="make">Type</label>
+            <label htmlFor="make">
+              Type <span className="required">*</span>
+            </label>
             <input
               type="text"
               required
@@ -202,7 +201,9 @@ function ModelsPage(props) {
             />
           </div>
           <div>
-            <label htmlFor="make">Engine</label>
+            <label htmlFor="make">
+              Engine <span className="required">*</span>
+            </label>
             <input
               type="text"
               required

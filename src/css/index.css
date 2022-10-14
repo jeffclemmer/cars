@@ -134,6 +134,11 @@ input[type="text"] {
   text-align: center;
 }
 
+.required {
+  font-size: 14px;
+  color: red;
+}
+
 .spin-container {
   position: absolute;
   z-index: 51;

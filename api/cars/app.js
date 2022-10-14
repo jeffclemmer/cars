@@ -21,22 +21,41 @@ Cars
 
 const AWS = require("aws-sdk");
 
+// load events
+const getMakes = require("./src/GetMakes");
+const addMake = require("./src/AddMake");
+const getModels = require("./src/GetModels");
+const deleteMake = require("./src/DeleteMake");
+const addModel = require("./src/AddModel");
+const deleteModel = require("./src/DeleteModel");
+
 // ternary to determine if we are we running dev or prod db
-// let dynamo = null;
 // AWS_SAM_LOCAL is passed as a string and not a bool
+// console.log("process.env.AWS_SAM_LOCAL:", process.env.AWS_SAM_LOCAL);
+// console.log(
+//   "process.env.AWS_SAM_LOCAL typeof :",
+//   typeof process.env.AWS_SAM_LOCAL
+// );
+
 const dynamo =
   process.env.AWS_SAM_LOCAL === "true"
     ? new AWS.DynamoDB.DocumentClient({
-        endpoint: new AWS.Endpoint("http://cars-app:8000"),
+        endpoint: new AWS.Endpoint("http://carsdb:8000"),
       })
     : new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event, context) => {
-  // console.log("event:", JSON.stringify(event));
-  // console.log("event.routeKey:", JSON.stringify(event.routeKey));
-  // console.log("event.body:", JSON.stringify(event.body));
-  // console.log("event.queryStringParameters:", event.queryStringParameters);
-  // console.log("event.pathParameters:", event.pathParameters);
+  // if developing locally, i'd like to see event variables in my terminal
+  if (process.env.AWS_SAM_LOCAL === "true") {
+    console.log("event:", JSON.stringify(event));
+    console.log("event.routeKey:", JSON.stringify(event.routeKey));
+    console.log("event.body:", JSON.stringify(event.body));
+    console.log("event.queryStringParameters:", event.queryStringParameters);
+    console.log("event.pathParameters:", event.pathParameters);
+  }
+
+  // add dynamo to the event object to pass into event handlers
+  event.dynamo = dynamo;
 
   let body;
   let statusCode = 200;
@@ -49,170 +68,40 @@ exports.handler = async (event, context) => {
   };
 
   try {
-    if (event.routeKey == "OPTIONS /{proxy+}") {
-      body = "";
-    }
-
     // list all makes
     if (event.routeKey == "GET /makes") {
-      const makes = await dynamo
-        .query({
-          TableName: "Cars",
-          KeyConditionExpression: "cid = :cid",
-          ExpressionAttributeValues: {
-            ":cid": "123456",
-          },
-          ProjectionExpression: "make, dname",
-        })
-        .promise();
-      body = JSON.stringify(makes.Items);
+      body = JSON.stringify(await getMakes(event));
     }
 
     // add make
     if (event.routeKey == "POST /add-make") {
-      let rec = JSON.parse(event.body);
-      await dynamo
-        .put({
-          TableName: "Cars",
-          Item: {
-            cid: "123456",
-            make: rec.make,
-            dname: rec.dname,
-            models: [],
-          },
-        })
-        .promise();
-
-      body = "+";
+      body = await addMake(event);
     }
 
     // list all models for a make
     if (event.routeKey == "GET /models/{make}") {
-      const make = await dynamo
-        .get({
-          TableName: "Cars",
-          Key: {
-            cid: "123456",
-            make: event.pathParameters.make,
-          },
-        })
-        .promise();
-
-      body = JSON.stringify({
-        dname: make.Item.dname,
-        models: make.Item.models,
-      });
+      body = await getModels(event);
     }
 
     // delete make
     if (event.routeKey == "GET /delete-make") {
-      if (
-        event.queryStringParameters &&
-        "makes" in event.queryStringParameters
-      ) {
-        let makes = event.queryStringParameters.makes.split(",");
-
-        for (let i in makes) {
-          await dynamo
-            .delete({
-              TableName: "Cars",
-              Key: {
-                cid: "123456",
-                make: makes[i],
-              },
-            })
-            .promise();
-        }
-        body = "+";
-      } else {
-        body = "-";
-      }
+      body = await deleteMake(event);
     }
 
     // add model
     if (event.routeKey == "POST /add-model") {
-      let rec = JSON.parse(event.body);
-      if (
-        "make" in rec &&
-        "model" in rec &&
-        "year" in rec &&
-        "type" in rec &&
-        "engine" in rec
-      ) {
-        const make = await dynamo
-          .get({
-            TableName: "Cars",
-            Key: {
-              cid: "123456",
-              make: rec.make,
-            },
-          })
-          .promise();
-
-        make.Item.models.push({
-          id: makeId(),
-          name: rec.model,
-          year: rec.year,
-          type: rec.type,
-          engine: rec.engine,
-        });
-
-        make.Item.models.sort((a, b) => {
-          const nameA = a.name.toUpperCase(); // ignore upper and lowercase
-          const nameB = b.name.toUpperCase(); // ignore upper and lowercase
-          if (nameA < nameB) {
-            return -1;
-          }
-          if (nameA > nameB) {
-            return 1;
-          }
-
-          // names must be equal
-          return 0;
-        });
-
-        // update db
-        await dynamo
-          .put({
-            TableName: "Cars",
-            Item: make.Item,
-          })
-          .promise();
-      }
+      body = await addModel(event);
     }
 
     // delete model
     if (event.routeKey == "GET /delete-model/{make}") {
-      if (
-        event.queryStringParameters &&
-        "models" in event.queryStringParameters
-      ) {
-        let models = event.queryStringParameters.models.split(",");
+      body = await deleteModel(event);
+    }
 
-        let make = await dynamo
-          .get({
-            TableName: "Cars",
-            Key: {
-              cid: "123456",
-              make: event.pathParameters.make,
-            },
-          })
-          .promise();
-
-        let save = make.Item.models.filter((item) => !models.includes(item.id));
-
-        make.Item.models = save;
-
-        // update db
-        await dynamo
-          .put({
-            TableName: "Cars",
-            Item: make.Item,
-          })
-          .promise();
-      }
-
-      body = "+";
+    if (event.routeKey == "OPTIONS /{proxy+}") {
+      body = "";
+    } else if (body === "") {
+      throw "route not handled";
     }
   } catch (error) {
     console.log("Error:", JSON.stringify(error));
@@ -227,6 +116,7 @@ exports.handler = async (event, context) => {
   };
 };
 
-function makeId() {
-  return Math.ceil(Math.random() * 10000).toString();
-}
+// let event = {
+//   routeKey: "GET /makes",
+// };
+// exports.handler(event);

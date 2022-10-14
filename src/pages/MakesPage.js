@@ -30,10 +30,7 @@ function MakesPage(props) {
   async function loadData() {
     setIsLoading(true);
     try {
-      const res = await fetch(
-        `https://ekib68jot5.execute-api.us-west-2.amazonaws.com/makes`,
-        {}
-      );
+      const res = await fetch(`//localhost:3000/makes`, {});
 
       if (res.status === 200) {
         const data = await res.json();
@@ -57,26 +54,25 @@ function MakesPage(props) {
   }
 
   async function addDialogButtonHandler(text) {
-    closeAddDialog();
+    if (text === "Cancel") closeAddDialog();
     if (text === "Save") {
       const name = makeInputRef.current.value;
       const make = name.toLowerCase().replace(" ", "");
 
       // normally we would do some deeper form validation here...
       if (make !== "") {
+        closeAddDialog();
+
         setIsLoading(true);
 
-        const res = await fetch(
-          "https://ekib68jot5.execute-api.us-west-2.amazonaws.com/add-make",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              make: make,
-              dname: name,
-            }),
-          }
-        );
+        const res = await fetch("//localhost:3000/add-make", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            make: make,
+            dname: name,
+          }),
+        });
 
         loadData();
       }
@@ -109,10 +105,7 @@ function MakesPage(props) {
 
       setIsLoading(true);
       // the server returns "+" after completing
-      await fetch(
-        `https://ekib68jot5.execute-api.us-west-2.amazonaws.com/delete-make?makes=${ids}`,
-        {}
-      );
+      await fetch(`//localhost:3000/delete-make?makes=${ids}`, {});
       setIsLoading(false);
 
       loadData();
@@ -147,7 +140,9 @@ function MakesPage(props) {
           buttons={["Cancel", "Save"]}
         >
           <div>
-            <label htmlFor="make">Name of Make</label>
+            <label htmlFor="make">
+              Name of Make <span className="required">*</span>
+            </label>
             <input
               type="text"
               required

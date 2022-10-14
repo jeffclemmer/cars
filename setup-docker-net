@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# we do this because we create a link between the AWS SAM container and the 
+# AWS DynamoDB container.  we're essentially doing container to container communication.
+
+docker network create carsnet
