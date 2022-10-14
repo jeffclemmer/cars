@@ -15,7 +15,7 @@ build and deploy:
 ./build-backend --deploy
 
 EOF
-	exit
+  exit
 
 fi
 
@@ -27,19 +27,19 @@ deploy="no"
 
 # loop through command line options
 for i in ${@}; do
-	if [[ $i == "--build" ]]; then
-		build="yes"
-	fi
-	if [[ $i == "--deploy" ]]; then
-		build="yes"
-		deploy="yes"
-	fi
+  if [[ $i == "--build" ]]; then
+    build="yes"
+  fi
+  if [[ $i == "--deploy" ]]; then
+    build="yes"
+    deploy="yes"
+  fi
 done
 
 # decide what actions to take
 # we add these options here so that we always do steps in the right order
 if [[ $build == "yes" ]]; then
-	echo "Building..."
+  echo "Building..."
   
   # if buildnumber file doesn't exist, create it
   if [[ ! -f ./buildnumber ]]; then
@@ -55,7 +55,7 @@ if [[ $build == "yes" ]]; then
 fi
 
 if [[ $deploy == "yes" ]]; then
-	echo "Deploying..."
+  echo "Deploying..."
   
   buildnumber=$(cat ./buildnumber)
   date=$(date +%y.%m.%d)

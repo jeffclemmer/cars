@@ -20,7 +20,7 @@ build and deploy for the first time
 ./build-backend --build --deploy -- guided
 
 EOF
-	exit
+  exit
 
 fi
 
@@ -35,21 +35,21 @@ guided=""
 
 # loop through command line options
 for i in ${@}; do
-	if [[ $i == "--build" ]]; then
-		build="yes"
-	fi
-	if [[ $i == "--deploy" ]]; then
-		deploy="yes"
-	fi
-	if [[ $i == "--guided" ]]; then
-		guided="--guided"
-	fi
+  if [[ $i == "--build" ]]; then
+    build="yes"
+  fi
+  if [[ $i == "--deploy" ]]; then
+    deploy="yes"
+  fi
+  if [[ $i == "--guided" ]]; then
+    guided="--guided"
+  fi
 done
 
 # decide what actions to take
 # we add these options here so that we always do steps in the right order
 if [[ $build == "yes" ]]; then
-	echo "Building..."
+  echo "Building..."
   
   # if buildnumber file doesn't exist, create it
   if [[ ! -f ./buildnumber ]]; then
@@ -67,7 +67,7 @@ if [[ $build == "yes" ]]; then
 fi
 
 if [[ $deploy == "yes" ]]; then
-	echo "Deploying..."
+  echo "Deploying..."
   
   cd api
   sam deploy $guided
