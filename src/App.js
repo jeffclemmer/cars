@@ -10,6 +10,7 @@ function App() {
         <Route path="/" element={<MakesPage />} />
         <Route path="/models/:make" element={<ModelsPage />} />
       </Routes>
+      <div className="center small">display:version</div>
     </main>
   );
 }

@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# if the user doesn't specify any command line options, offer them some help
+if [[ ${#@} == 0 ]]; then
+  cat << EOF
+
+To use this command, specify the following parameters:
+--build - builds the codebase
+--deploy - deploys this codebase to production
+--guided - sam deploy --guided
+  use on first build
+
+build:
+./build-backend --build
+
+build and deploy
+./build-backend --build --deploy
+
+build and deploy for the first time
+./build-backend --build --deploy -- guided
+
+EOF
+	exit
+
+fi
+
+pwd=($(pwd))
+
+# setup script variables
+build="no"
+deploy="no"
+
+# keep this blank unless we add the guided switch
+guided=""
+
+# loop through command line options
+for i in ${@}; do
+	if [[ $i == "--build" ]]; then
+		build="yes"
+	fi
+	if [[ $i == "--deploy" ]]; then
+		deploy="yes"
+	fi
+	if [[ $i == "--guided" ]]; then
+		guided="--guided"
+	fi
+done
+
+# decide what actions to take
+# we add these options here so that we always do steps in the right order
+if [[ $build == "yes" ]]; then
+	echo "Building..."
+  
+  # if buildnumber file doesn't exist, create it
+  if [[ ! -f ./buildnumber ]]; then
+    echo "1" > ./buildnumber
+  fi
+  
+  # increment buildnumber number
+  buildnumber=$(cat ./buildnumber)
+  let "buildnumber++"
+  echo $buildnumber > ./buildnumber
+  
+  cd api
+  sam build
+  cd $pwd
+fi
+
+if [[ $deploy == "yes" ]]; then
+	echo "Deploying..."
+  
+  cd api
+  sam deploy $guided
+  cd $pwd
+fi

@@ -1,0 +1,90 @@
+#!/bin/bash
+
+# if the user doesn't specify any command line options, offer them some help
+if [[ ${#@} == 0 ]]; then
+  cat << EOF
+
+To use this command, specify the following parameters:
+--build - builds the codebase"
+--deploy - deploys this codebase to production
+
+build:
+./build-backend --build
+
+build and deploy:
+./build-backend --deploy
+
+EOF
+	exit
+
+fi
+
+pwd=($(pwd))
+
+# setup script variables
+build="no"
+deploy="no"
+
+# loop through command line options
+for i in ${@}; do
+	if [[ $i == "--build" ]]; then
+		build="yes"
+	fi
+	if [[ $i == "--deploy" ]]; then
+		build="yes"
+		deploy="yes"
+	fi
+done
+
+# decide what actions to take
+# we add these options here so that we always do steps in the right order
+if [[ $build == "yes" ]]; then
+	echo "Building..."
+  
+  # if buildnumber file doesn't exist, create it
+  if [[ ! -f ./buildnumber ]]; then
+    echo "1" > ./buildnumber
+  fi
+  
+  # increment buildnumber number
+  buildnumber=$(cat ./buildnumber)
+  let "buildnumber++"
+  echo $buildnumber > ./buildnumber
+  
+  npm run build
+fi
+
+if [[ $deploy == "yes" ]]; then
+	echo "Deploying..."
+  
+  buildnumber=$(cat ./buildnumber)
+  date=$(date +%y.%m.%d)
+  date="v$date b$buildnumber"
+  
+  cd build
+  
+  # update versions
+  files=($(grep -HRl "display:version" *))
+  for i in "${files[@]}"
+  do
+    echo "changing display:version in $i to $date"
+    sed -i "s/display:version/$date/g" $i
+  done
+  
+  # change fetch urls from dev to prod
+  files=($(grep -HRl "//localhost:3000" *))
+  for i in "${files[@]}"
+  do
+    echo "changing fetch urls in $i"
+    sed -i "s/\/\/localhost:3000/https:\/\/ekib68jot5.execute-api.us-west-2.amazonaws.com/g" $i
+  done
+  
+  cd $pwd
+  
+  mkdir -p ./deploy
+  rsync -avs ./build/* ./deploy
+  
+  # deploy to cloudflare
+  cd ./deploy/ && git add . && git commit -m "Prod Build $date" && git push origin main && cd $pwd
+  
+fi
