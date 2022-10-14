@@ -8,15 +8,15 @@ Globals:
     Timeout: 300
 
 Resources:
-  ApiGatewayApi:
-    Type: AWS::Serverless::Api
-    Properties:
-      StageName: Dev
-      Cors:
-        AllowMethods: "'GET, POST, OPTIONS'"
-        AllowOrigin: "'*'"
-        AllowHeaders: "'Content-type, x-api-key'"
-        MaxAge: "'86400'"
+  # ApiGatewayApi:
+  #   Type: AWS::Serverless::Api
+  #   Properties:
+  #     StageName: Dev
+  #     Cors:
+  #       AllowMethods: "'GET, POST, OPTIONS'"
+  #       AllowOrigin: "'*'"
+  #       AllowHeaders: "'Content-type, x-api-key'"
+  #       MaxAge: "'86400'"
 
   CarsFunction:
     Type: AWS::Serverless::Function
