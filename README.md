@@ -10,7 +10,7 @@ This _was_ a quick React Demo App I threw together over a couple of days. Now it
 
 This app could be classified as a Single Page App or SPA.
 
-It implements a simple car inventory system. There is one feature that isn't implemented. Editing Items. That's easily added though. Let me know if you'd like me to do that.
+It implements a simple car inventory system.
 
 I built this to keep up with modern AWS and React development.
 
