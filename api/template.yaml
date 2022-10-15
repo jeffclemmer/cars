@@ -60,6 +60,11 @@ Resources:
           Properties:
             Path: /add-model
             Method: post
+        UpdateModel:
+          Type: HttpApi
+          Properties:
+            Path: /update-model
+            Method: post
         DeleteModel:
           Type: HttpApi
           Properties:

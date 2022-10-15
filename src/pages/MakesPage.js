@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 
+import { onlyLowercase } from "../helpers/Filter";
+
 import Dialog from "../components/Dialog";
 import Overlay from "../components/Overlay";
 import Toolbar from "../components/Toolbar";
@@ -57,7 +59,8 @@ function MakesPage(props) {
     if (text === "Cancel") closeAddDialog();
     if (text === "Save") {
       const name = makeInputRef.current.value;
-      const make = name.toLowerCase().replace(" ", "");
+      // const make = name.toLowerCase().replace(" ", "");
+      const make = onlyLowercase(name);
 
       // normally we would do some deeper form validation here...
       if (make !== "") {
@@ -65,7 +68,7 @@ function MakesPage(props) {
 
         setIsLoading(true);
 
-        const res = await fetch("//localhost:3000/add-make", {
+        await fetch("//localhost:3000/add-make", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

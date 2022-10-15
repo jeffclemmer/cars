@@ -28,6 +28,7 @@ const getModels = require("./src/GetModels");
 const deleteMake = require("./src/DeleteMake");
 const addModel = require("./src/AddModel");
 const deleteModel = require("./src/DeleteModel");
+const updateModel = require("./src/UpdateModel");
 
 // ternary to determine if we are we running dev or prod db
 // AWS_SAM_LOCAL is passed as a string and not a bool
@@ -91,6 +92,11 @@ exports.handler = async (event, context) => {
     // add model
     if (event.routeKey == "POST /add-model") {
       body = await addModel(event);
+    }
+
+    // update model
+    if (event.routeKey == "POST /update-model") {
+      body = await updateModel(event);
     }
 
     // delete model

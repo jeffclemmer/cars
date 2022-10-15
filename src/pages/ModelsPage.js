@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 import Dialog from "../components/Dialog";
@@ -10,16 +10,28 @@ import ListItem from "../components/ListItem";
 
 // contains the entire page for Models
 function ModelsPage(props) {
-  const modelInputRef = useRef();
-  const yearInputRef = useRef();
-  const typeInputRef = useRef();
-  const engineInputRef = useRef();
+  // const modelInputRef = useRef();
+  // const yearInputRef = useRef();
+  // const typeInputRef = useRef();
+  // const engineInputRef = useRef();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [models, updateModels] = useState([]);
   const [name, updateName] = useState([]);
+
+  // dialog edit fields
+  const [model, setModel] = useState("");
+  const [year, setYear] = useState("");
+  const [type, setType] = useState("");
+  const [engine, setEngine] = useState("");
+
+  // if updating a model, save the current editId
+  const [editId, setEditId] = useState("");
+
+  // edit dialog buttons
+  const [editButtons, setEditButtons] = useState([]);
 
   // an array of ids that points into "makes".  if an id
   // exists in this array, that means it's selected = true
@@ -56,6 +68,12 @@ function ModelsPage(props) {
   }
 
   function addItem() {
+    setEditId("");
+    setModel("");
+    setType("");
+    setYear("");
+    setEngine("");
+    setEditButtons(["Cancel", "Save"]);
     setIsAddDialogOpen(true);
   }
 
@@ -66,33 +84,43 @@ function ModelsPage(props) {
   async function addDialogButtonHandler(text) {
     if (text === "Cancel") closeAddDialog();
 
-    const model = modelInputRef.current.value;
-    const year = yearInputRef.current.value;
-    const type = typeInputRef.current.value;
-    const engine = engineInputRef.current.value;
+    // const model = modelInputRef.current.value;
+    // const year = yearInputRef.current.value;
+    // const type = typeInputRef.current.value;
+    // const engine = engineInputRef.current.value;
 
-    if (text === "Save") {
-      // normally we would do some deeper form validation here...
-      if (model && year && type && engine) {
-        closeAddDialog();
-        setIsLoading(true);
-        const res = await fetch("//localhost:3000/add-model", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            make: make,
-            model: model,
-            year: year,
-            type: type,
-            engine: engine,
-          }),
-        });
+    let url = "";
+    let body = {};
+    if (text === "Save" || text === "Update") {
+      url = "add-model";
 
-        loadData(make);
-      }
+      // fill these out on save or update
+      body = {
+        make: make,
+        model: model,
+        year: year,
+        type: type,
+        engine: engine,
+      };
     }
 
     if (text === "Update") {
+      // only add/change these if we're updating
+      url = "update-model";
+      body.id = editId;
+    }
+
+    // normally we would do some deeper form validation here...
+    if (url && model && year && type && engine) {
+      closeAddDialog();
+      setIsLoading(true);
+      await fetch(`//localhost:3000/${url}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      loadData(make);
     }
   }
 
@@ -107,7 +135,16 @@ function ModelsPage(props) {
   }
 
   function editItem(id) {
-    console.log("listItem editClick id:", id);
+    let rec = models.find((e) => e.id === id);
+
+    setModel(rec.name);
+    setType(rec.type);
+    setYear(rec.year);
+    setEngine(rec.engine);
+
+    setEditId(id);
+    setEditButtons(["Cancel", "Update"]);
+    setIsAddDialogOpen(true);
   }
 
   function deleteItem() {
@@ -161,7 +198,7 @@ function ModelsPage(props) {
         <Dialog
           title="Add New Model"
           buttonHandler={addDialogButtonHandler}
-          buttons={["Cancel", "Save"]}
+          buttons={editButtons}
         >
           <div>
             <label htmlFor="make">
@@ -171,7 +208,8 @@ function ModelsPage(props) {
               type="text"
               required
               id="model"
-              ref={modelInputRef}
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
               autoComplete="off"
             />
           </div>
@@ -183,7 +221,8 @@ function ModelsPage(props) {
               type="text"
               required
               id="year"
-              ref={yearInputRef}
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
               autoComplete="off"
             />
           </div>
@@ -195,7 +234,8 @@ function ModelsPage(props) {
               type="text"
               required
               id="type"
-              ref={typeInputRef}
+              value={type}
+              onChange={(e) => setType(e.target.value)}
               autoComplete="off"
             />
           </div>
@@ -207,7 +247,8 @@ function ModelsPage(props) {
               type="text"
               required
               id="engine"
-              ref={engineInputRef}
+              value={engine}
+              onChange={(e) => setEngine(e.target.value)}
               autoComplete="off"
             />
           </div>
